@@ -14,6 +14,14 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
+        body.light-mode {
+            --bg-color: #f0f2f5;
+            --text-color: #1c1e21;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --input-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
         body {
             margin: 0; padding: 0;
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
@@ -22,6 +30,7 @@
             line-height: 1.6;
             scroll-behavior: smooth;
             overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* === 배경 효과 (Stars) === */
@@ -30,6 +39,11 @@
             background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0c 100%);
             z-index: -1;
             overflow: hidden;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.light-mode .stars-container {
+            opacity: 0;
         }
 
         .star {
@@ -100,7 +114,7 @@
         .card {
             background: var(--glass-bg); padding: 30px; border-radius: 20px;
             border: 1px solid var(--border-color);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s;
             position: relative;
             display: flex; flex-direction: column;
         }
@@ -139,12 +153,18 @@
             border-radius: 24px; text-align: center;
             position: relative;
             box-shadow: 0 0 30px rgba(241, 196, 15, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        body.light-mode .modal-content {
+            background: rgba(250, 250, 250, 0.95);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
         }
 
         .member-list { list-style: none; padding: 0; margin: 30px 0; }
         .member-list li {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 10px; border-bottom: 1px solid var(--border-color);
         }
         .member-list .kor { font-size: 1.2rem; font-weight: 500; }
         .member-list .eng { font-size: 0.9rem; color: var(--accent-color); opacity: 0.7; }
@@ -171,7 +191,7 @@
         .modal input {
             width: 100%; padding: 12px; box-sizing: border-box;
             background: var(--input-bg); border: 1px solid var(--border-color);
-            border-radius: 8px; color: white; text-align: right; font-size: 1rem;
+            border-radius: 8px; color: var(--text-color); text-align: right; font-size: 1rem;
         }
         .modal input:focus { outline: none; border-color: var(--accent-color); }
 
@@ -200,7 +220,7 @@
 
         .res-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
         .res-val { color: var(--accent-color); font-weight: bold; }
-        .res-total { font-size: 1.3rem; color: #fff; font-weight: bold; }
+        .res-total { font-size: 1.3rem; color: var(--text-color); font-weight: bold; }
 
         /* 배당금 시뮬레이션 섹션 (신규) */
         .dividend-area {
@@ -229,6 +249,7 @@
         <div class="btn-group">
             <a href="#about" class="btn">모임 소개</a>
             <button class="btn" onclick="openModal('memberModal')">멤버 확인</button>
+            <button class="btn" onclick="toggleTheme()">테마 변경</button>
         </div>
     </header>
 
@@ -355,7 +376,7 @@
                     </div>
                     <div class="highlight-box" style="text-align:center; padding: 15px; margin-top:10px;">
                         <span style="display:block; font-size:0.9rem; color:#aaa; margin-bottom:5px;">세후 월 수령액</span>
-                        <span id="monthly-payout" style="font-size:1.6rem; color:#fff; font-weight:bold;">0 원</span>
+                        <span id="monthly-payout" style="font-size:1.6rem; color:var(--text-color); font-weight:bold;">0 원</span>
                         <div style="font-size:0.8rem; color:var(--accent-color); margin-top:5px; opacity:0.8;" id="yearly-payout">(연 0 원)</div>
                     </div>
                 </div>
@@ -370,6 +391,21 @@
     </footer>
 
     <script>
+        // === 테마 관리 ===
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const currentTheme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+            localStorage.setItem('moonshine-theme', currentTheme);
+        }
+
+        // 페이지 로드 시 테마 적용
+        (function() {
+            const savedTheme = localStorage.getItem('moonshine-theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        })();
+
         // 전역 변수: 최종 자산을 저장해둠 (배당 계산용)
         let g_finalBalance = 0;
 
