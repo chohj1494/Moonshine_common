@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine | AI 시대를 밝히는 빛</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --text-color: #e0e0e0;
+            --accent-color: #f1c40f; /* Moonshine Gold */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* === 배경 효과 (Stars) === */
+        .stars-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0c 100%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: var(--opacity); transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        /* === 헤더 및 로고 === */
+        header {
+            height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 0 20px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 4rem; font-weight: 800; letter-spacing: 4px;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tagline { font-size: 1.2rem; opacity: 0.8; margin-bottom: 30px; word-break: keep-all; }
+
+        .btn-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+
+        .btn {
+            padding: 12px 30px; background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color); cursor: pointer;
+            text-decoration: none; border-radius: 50px;
+            transition: all 0.3s; font-size: 1rem;
+        }
+
+        .btn:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 15px var(--accent-color); }
+
+        /* === 메인 컨텐츠 === */
+        .container {
+            max-width: 900px; margin: 0 auto; padding: 100px 20px;
+        }
+
+        h2 {
+            color: var(--accent-color); border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 10px; display: inline-block; margin-bottom: 30px;
+        }
+
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; margin-top: 50px;
+        }
+
+        .card {
+            background: var(--glass-bg); padding: 30px; border-radius: 20px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+            position: relative;
+            display: flex; flex-direction: column;
+        }
+
+        .card:hover { transform: translateY(-10px); border-color: var(--accent-color); }
+        
+        .card h3 { margin-top: 0; color: var(--accent-color); }
+        .card p { flex-grow: 1; margin-bottom: 20px; }
+
+        .card-btn {
+            padding: 10px;
+            background: rgba(241, 196, 15, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .card-btn:hover { background: var(--accent-color); color: #000; }
+
+        /* === 모달 공통 스타일 === */
+        .modal {
+            display: none; position: fixed; z-index: 100;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 25, 0.95);
+            margin: 5% auto; padding: 40px;
+            border: 1px solid var(--accent-color);
+            width: 85%; max-width: 500px;
+            border-radius: 24px; text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.1);
+        }
+
+        .member-list { list-style: none; padding: 0; margin: 30px 0; }
+        .member-list li {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .member-list .kor { font-size: 1.2rem; font-weight: 500; }
+        .member-list .eng { font-size: 0.9rem; color: var(--accent-color); opacity: 0.7; }
+
+        .close-link { margin-top: 20px; display: inline-block; cursor: pointer; opacity: 0.5; text-decoration: underline; }
+
+        /* === 계산기 전용 스타일 === */
+        .calc-tabs {
+            display: flex; gap: 10px; margin-bottom: 20px; padding: 5px;
+            background: rgba(255,255,255,0.05); border-radius: 12px;
+        }
+        .calc-tab-btn {
+            flex: 1; padding: 10px; border: none; background: transparent;
+            color: #888; cursor: pointer; font-weight: bold; border-radius: 8px;
+            transition: 0.3s;
+        }
+        .calc-tab-btn.active { background: var(--accent-color); color: #000; }
+
+        .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-group { flex: 1; text-align: left; }
+        
+        .modal label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 5px; }
+        
+        .modal input {
+            width: 100%; padding: 12px; box-sizing: border-box;
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; color: white; text-align: right; font-size: 1rem;
+        }
+        .modal input:focus { outline: none; border-color: var(--accent-color); }
+
+        .calc-section { 
+            background: rgba(255,255,255,0.03); padding: 15px; 
+            border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color);
+        }
+
+        .highlight-box {
+            border: 1px dashed var(--accent-color); background: rgba(241, 196, 15, 0.05);
+            border-radius: 12px;
+        }
+
+        /* 결과창 스타일 수정 */
+        .result-area {
+            margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.5);
+            border-radius: 12px; display: none; text-align: left;
+            border-left: 4px solid var(--accent-color);
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .res-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .res-val { color: var(--accent-color); font-weight: bold; }
+        .res-total { font-size: 1.3rem; color: #fff; font-weight: bold; }
+
+        /* 배당금 시뮬레이션 섹션 (신규) */
+        .dividend-area {
+            margin-top: 20px; 
+            padding-top: 20px; 
+            border-top: 1px dashed rgba(255,255,255,0.2);
+            display: none; /* JS로 제어 */
+        }
+
+        footer { text-align: center; padding: 100px 50px; font-size: 0.9rem; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2.5rem; }
+            .tagline { font-size: 1rem; padding: 0 10px; }
+            .container { padding: 60px 20px; }
+            .modal-content { width: 85%; padding: 25px; margin-top: 15vh; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars-container" id="starBg"></div>
+
+    <header>
+        <div class="logo">MOONSHINE</div>
+        <p class="tagline">인공지능의 거대한 파도 속에서, 우리만의 빛을 찾다</p>
+        <div class="btn-group">
+            <a href="#about" class="btn">모임 소개</a>
+            <button class="btn" onclick="openModal('memberModal')">멤버 확인</button>
+        </div>
+    </header>
+
+    <div class="container" id="about">
+        <section>
+            <h2>About Moonshine</h2>
+            <p>우리는 AI 기술을 단순히 도구로 사용하는 것을 넘어, 인간다움과 기술이 조화를 이루는 미래를 탐구합니다. 어두운 밤하늘을 은은하게 비추는 달빛(Moonshine)처럼, AI 시대의 복잡함 속에서 명료한 방향을 제시합니다.</p>
+        </section>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>💡 Insight</h3>
+                <p>복리 효과와 투자 로드맵을 시뮬레이션하고, 은퇴 후 현금 흐름까지 분석합니다.</p>
+                <button class="card-btn" onclick="openModal('calcModal')">AI 자산 계산기 열기</button>
+            </div>
+            
+            <div class="card">
+                <h3>⚖️ Ethics</h3>
+                <p>기술이 가져올 변화 속에서 우리가 지켜야 할 가치와 윤리를 논의합니다.</p>
+            </div>
+            
+            <div class="card">
+                <h3>🤝 Networking</h3>
+                <p>다양한 분야의 전문가들이 모여 AI와 시너지를 낼 수 있는 기회를 만듭니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 10px;">Our Members</h2>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Moonshine과 함께하는 사람들</p>
+            <ul class="member-list">
+                <li><span class="kor">조호준</span><span class="eng">Cho Ho-jun</span></li>
+                <li><span class="kor">임경민</span><span class="eng">Lim Kyung-min</span></li>
+                <li><span class="kor">안동길</span><span class="eng">Ahn Dong-gil</span></li>
+                <li><span class="kor">백동호</span><span class="eng">Baek Dong-ho</span></li>
+                <li><span class="kor">전명훈</span><span class="eng">Jeon Myung-hoon</span></li>
+            </ul>
+            <span class="close-link" onclick="closeModal('memberModal')">닫기</span>
+        </div>
+    </div>
+
+    <div id="calcModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Financial Insight</h2>
+            
+            <div class="calc-tabs">
+                <button class="calc-tab-btn active" onclick="switchTab('simple')">기본 복리</button>
+                <button class="calc-tab-btn" onclick="switchTab('advanced')">로드맵 (2단계)</button>
+            </div>
+
+            <div id="mode-simple">
+                <div class="calc-section">
+                    <div class="input-row">
+                        <div class="input-group"><label>초기 자금</label><input type="text" id="sim_principal" placeholder="0" onkeyup="fmt(this)"></div>
+                        <div class="input-group"><label>월 적립액</label><input type="text" id="sim_monthly" placeholder="0" onkeyup="fmt(this)"></div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group"><label>기간 (년)</label><input type="number" id="sim_years" placeholder="10"></div>
+                        <div class="input-group"><label>연 수익률 (%)</label><input type="number" id="sim_rate" placeholder="5" step="0.1"></div>
+                    </div>
+                </div>
+                <button class="card-btn" onclick="runSimple()">계산하기</button>
+            </div>
+
+            <div id="mode-advanced" style="display: none;">
+                <div class="calc-section">
+                    <div class="input-row">
+                        <div class="input-group"><label>초기 자금</label><input type="text" id="adv_principal" placeholder="0" onkeyup="fmt(this)"></div>
+                        <div class="input-group"><label>월 적립액</label><input type="text" id="adv_monthly" placeholder="0" onkeyup="fmt(this)"></div>
+                    </div>
+                </div>
+                
+                <div class="calc-section">
+                    <label style="color:var(--accent-color); font-weight:bold; margin-bottom:10px;">1구간 (초기 투자)</label>
+                    <div class="input-row">
+                        <div class="input-group"><label>기간(년)</label><input type="number" id="adv_p1_years" placeholder="3"></div>
+                        <div class="input-group"><label>수익률(%)</label><input type="number" id="adv_p1_rate" placeholder="8"></div>
+                    </div>
+                </div>
+
+                <div class="calc-section highlight-box">
+                    <label style="color:var(--accent-color);">💰 1구간 종료 후 추가 납입</label>
+                    <input type="text" id="adv_lumpSum" placeholder="보너스 등 추가 금액" onkeyup="fmt(this)" style="margin-top:5px;">
+                </div>
+
+                <div class="calc-section">
+                    <label style="color:var(--accent-color); font-weight:bold; margin-bottom:10px;">2구간 (잔여 기간)</label>
+                    <div class="input-row">
+                        <div class="input-group"><label>기간(년)</label><input type="number" id="adv_p2_years" placeholder="12"></div>
+                        <div class="input-group"><label>수익률(%)</label><input type="number" id="adv_p2_rate" placeholder="5"></div>
+                    </div>
+                </div>
+                <button class="card-btn" onclick="runAdvanced()">시뮬레이션 실행</button>
+            </div>
+
+            <div id="result-area" class="result-area">
+                <div class="res-row">
+                    <span>총 투자 원금</span>
+                    <span id="res-invested">0 원</span>
+                </div>
+                <div class="res-row">
+                    <span>순수 이자 수익</span>
+                    <span class="res-val" id="res-profit">0 원</span>
+                </div>
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
+                <div class="res-row" style="align-items: flex-end;">
+                    <span>최종 예상 자산</span>
+                    <span class="res-total" id="res-final">0 원</span>
+                </div>
+
+                <div id="dividend-area" class="dividend-area">
+                    <h3 style="color:var(--accent-color); font-size:1.1rem; margin-bottom:15px;">📊 은퇴 후 현금 흐름 (배당/이자)</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>예상 배당률 (%)</label>
+                            <input type="number" id="div_rate" value="5" oninput="calcDividend()">
+                        </div>
+                        <div class="input-group">
+                            <label>세금율 (%)</label>
+                            <input type="number" id="tax_rate" value="9.9" oninput="calcDividend()">
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="text-align:center; padding: 15px; margin-top:10px;">
+                        <span style="display:block; font-size:0.9rem; color:#aaa; margin-bottom:5px;">세후 월 수령액</span>
+                        <span id="monthly-payout" style="font-size:1.6rem; color:#fff; font-weight:bold;">0 원</span>
+                        <div style="font-size:0.8rem; color:var(--accent-color); margin-top:5px; opacity:0.8;" id="yearly-payout">(연 0 원)</div>
+                    </div>
+                </div>
+            </div>
+
+            <span class="close-link" onclick="closeModal('calcModal')">닫기</span>
+        </div>
+    </div>
+
+    <footer>
+        © 2026 Moonshine Community. All Rights Reserved.
+    </footer>
+
+    <script>
+        // 전역 변수: 최종 자산을 저장해둠 (배당 계산용)
+        let g_finalBalance = 0;
+
+        // === 모달 시스템 ===
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        }
+
+        // === 탭 전환 ===
+        function switchTab(mode) {
+            const tabs = document.querySelectorAll('.calc-tab-btn');
+            const simpleDiv = document.getElementById('mode-simple');
+            const advDiv = document.getElementById('mode-advanced');
+            
+            // 탭 변경 시 결과창 일단 숨기기 (새로 계산 유도)
+            document.getElementById('result-area').style.display = 'none';
+
+            if(mode === 'simple') {
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+                simpleDiv.style.display = 'block';
+                advDiv.style.display = 'none';
+            } else {
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+                simpleDiv.style.display = 'none';
+                advDiv.style.display = 'block';
+            }
+        }
+
+        // === 유틸리티 ===
+        function fmt(obj) { obj.value = comma(uncomma(obj.value)); }
+        function comma(str) { return String(str).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,'); }
+        function uncomma(str) { return String(str).replace(/[^\d]+/g, ''); }
+        function getVal(id) { return parseFloat(uncomma(document.getElementById(id).value)) || 0; }
+        function toMoney(num) { return new Intl.NumberFormat('ko-KR').format(Math.floor(num)) + " 원"; }
+
+        // === 기본 계산 ===
+        function runSimple() {
+            const P = getVal('sim_principal');
+            const M = getVal('sim_monthly');
+            const Y = parseFloat(document.getElementById('sim_years').value) || 0;
+            const R = parseFloat(document.getElementById('sim_rate').value) || 0;
+
+            if(Y <= 0 && P === 0 && M === 0) { alert('데이터를 입력해주세요.'); return; }
+
+            let bal = P, inv = P;
+            const months = Y * 12;
+            const mRate = (R / 100) / 12;
+
+            for(let i=0; i<months; i++) {
+                bal = bal + (bal * mRate) + M;
+                inv += M;
+            }
+            showResult(bal, inv);
+        }
+
+        // === 고급 계산 ===
+        function runAdvanced() {
+            const P = getVal('adv_principal');
+            const M = getVal('adv_monthly');
+            const Lump = getVal('adv_lumpSum');
+            
+            const y1 = parseFloat(document.getElementById('adv_p1_years').value) || 0;
+            const r1 = parseFloat(document.getElementById('adv_p1_rate').value) || 0;
+            const y2 = parseFloat(document.getElementById('adv_p2_years').value) || 0;
+            const r2 = parseFloat(document.getElementById('adv_p2_rate').value) || 0;
+
+            if(y1===0 && y2===0) { alert('기간을 설정해주세요.'); return; }
+
+            let bal = P, inv = P;
+            // Phase 1
+            for(let i=0; i < y1*12; i++) {
+                bal = bal + (bal * (r1/100/12)) + M;
+                inv += M;
+            }
+            // Event
+            bal += Lump; inv += Lump;
+            // Phase 2
+            for(let i=0; i < y2*12; i++) {
+                bal = bal + (bal * (r2/100/12)) + M;
+                inv += M;
+            }
+            showResult(bal, inv);
+        }
+
+        // === 결과 출력 및 배당 섹션 트리거 ===
+        function showResult(finalBal, totalInv) {
+            g_finalBalance = finalBal; // 전역 변수 저장
+
+            const profit = finalBal - totalInv;
+            document.getElementById('res-invested').innerText = toMoney(totalInv);
+            document.getElementById('res-profit').innerText = "+" + toMoney(profit);
+            document.getElementById('res-final').innerText = toMoney(finalBal);
+            
+            // 결과창 표시
+            document.getElementById('result-area').style.display = 'block';
+            
+            // 배당금 섹션 표시 및 초기 계산
+            document.getElementById('dividend-area').style.display = 'block';
+            calcDividend(); 
+        }
+
+        // === [NEW] 배당금/세후 수령액 계산 ===
+        function calcDividend() {
+            if (g_finalBalance <= 0) return;
+
+            const divRate = parseFloat(document.getElementById('div_rate').value) || 0;
+            const taxRate = parseFloat(document.getElementById('tax_rate').value) || 0;
+
+            // 연간 배당금 (세전)
+            const annualPreTax = g_finalBalance * (divRate / 100);
+            
+            // 세금 계산
+            const taxAmount = annualPreTax * (taxRate / 100);
+            
+            // 연간 배당금 (세후)
+            const annualAfterTax = annualPreTax - taxAmount;
+            
+            // 월 수령액
+            const monthlyPayout = annualAfterTax / 12;
+
+            document.getElementById('monthly-payout').innerText = toMoney(monthlyPayout);
+            document.getElementById('yearly-payout').innerText = "(연 " + toMoney(annualAfterTax) + ")";
+        }
+
+        // === 별 배경 ===
+        function createStars() {
+            const container = document.getElementById('starBg');
+            const starCount = 100;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 2 + 1;
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+                const opacity = Math.random() * 0.7 + 0.3;
+                star.style.left = `${x}%`; star.style.top = `${y}%`;
+                star.style.width = `${size}px`; star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.animationDelay = `${delay}s`;
+                star.style.setProperty('--opacity', opacity);
+                container.appendChild(star);
+            }
+        }
+        window.onload = createStars;
+    </script>
+</body>
+</html>
