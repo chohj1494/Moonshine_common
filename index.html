@@ -254,6 +254,15 @@
             display: none; /* JS로 제어 */
         }
 
+        /* === 댓글창 스타일 === */
+        #disqus_thread {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-top: 50px;
+        }
+
         footer { text-align: center; padding: 100px 50px; font-size: 0.9rem; opacity: 0.5; }
 
         @media (max-width: 768px) {
@@ -301,6 +310,21 @@
                 <p>다양한 분야의 전문가들이 모여 AI와 시너지를 낼 수 있는 기회를 만듭니다.</p>
             </div>
         </div>
+
+        <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    this.page.url = window.location.href;  // Use current page's URL
+    this.page.identifier = 'moonshine_homepage'; // Unique identifier for this page
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://moonshinebuilder.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
 
     <div id="memberModal" class="modal">
