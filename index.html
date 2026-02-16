@@ -33,6 +33,30 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* === 테마 변경 버튼 === */
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .theme-toggle-btn:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.1) rotate(15deg);
+        }
+
         /* === 배경 효과 (Stars) === */
         .stars-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -237,10 +261,12 @@
             .tagline { font-size: 1rem; padding: 0 10px; }
             .container { padding: 60px 20px; }
             .modal-content { width: 85%; padding: 25px; margin-top: 15vh; }
+            .theme-toggle-btn { top: 15px; right: 15px; width: 40px; height: 40px; font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
+    <button id="theme-toggle" class="theme-toggle-btn"></button>
     <div class="stars-container" id="starBg"></div>
 
     <header>
@@ -249,7 +275,6 @@
         <div class="btn-group">
             <a href="#about" class="btn">모임 소개</a>
             <button class="btn" onclick="openModal('memberModal')">멤버 확인</button>
-            <button class="btn" onclick="toggleTheme()">테마 변경</button>
         </div>
     </header>
 
@@ -391,21 +416,29 @@
     </footer>
 
     <script>
+        const themeToggleButton = document.getElementById('theme-toggle');
+
         // === 테마 관리 ===
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
-            const currentTheme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
-            localStorage.setItem('moonshine-theme', currentTheme);
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('moonshine-theme', isLight ? 'light' : 'dark');
+            themeToggleButton.innerText = isLight ? '🌙' : '☀️';
         }
 
         // 페이지 로드 시 테마 적용
-        (function() {
+        function applyInitialTheme() {
             const savedTheme = localStorage.getItem('moonshine-theme');
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
+                themeToggleButton.innerText = '🌙';
+            } else {
+                themeToggleButton.innerText = '☀️';
             }
-        })();
-
+        }
+        
+        themeToggleButton.addEventListener('click', toggleTheme);
+        
         // 전역 변수: 최종 자산을 저장해둠 (배당 계산용)
         let g_finalBalance = 0;
 
@@ -564,7 +597,16 @@
                 container.appendChild(star);
             }
         }
-        window.onload = createStars;
+        
+        // 초기화 함수
+        function init() {
+            applyInitialTheme();
+            createStars();
+        }
+
+        // DOM 로드 후 초기화 실행
+        document.addEventListener('DOMContentLoaded', init);
+
     </script>
 </body>
 </html>
