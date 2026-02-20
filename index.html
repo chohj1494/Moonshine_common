@@ -256,6 +256,26 @@
             display: none; /* JS로 제어 */
         }
 
+        /* === 자동 업로드 모달 스타일 === */
+        .checkbox-container {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px; background: rgba(255,255,255,0.05);
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .checkbox-container:hover { border-color: var(--accent-color); background: rgba(255,255,255,0.1); }
+        .checkbox-container input { transform: scale(1.2); cursor: pointer; }
+
+        #drop-zone.dragover {
+            border-color: var(--accent-color) !important;
+            background: rgba(241, 196, 15, 0.1);
+        }
+        
+        #file-preview img, #file-preview video {
+            height: 60px; width: 60px; object-fit: cover;
+            border-radius: 6px; border: 1px solid var(--border-color);
+        }
+
         /* === 댓글창 스타일 === */
         #disqus_thread {
             background: var(--glass-bg);
@@ -298,7 +318,8 @@
             <div class="card">
                 <h3>💡 Insight</h3>
                 <p>복리 효과와 투자 로드맵을 시뮬레이션하고, 은퇴 후 현금 흐름까지 분석합니다.</p>
-                <button class="card-btn" onclick="openModal('calcModal')">AI 자산 계산기 열기</button>
+                <button class="card-btn" onclick="openModal('calcModal')" style="margin-bottom: 10px;">AI 자산 계산기 열기</button>
+                <button class="card-btn" onclick="openModal('uploadModal')">자동 업로드 도구</button>
             </div>
             
             <div class="card">
@@ -329,6 +350,50 @@
     })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
+    <div id="uploadModal" class="modal">
+        <div class="modal-content" style="text-align: left;">
+            <h2 style="text-align: center; margin-bottom: 20px;">Auto Uploader</h2>
+            
+            <!-- Step 1: 플랫폼 선택 -->
+            <div class="calc-section">
+                <label style="color:var(--accent-color); font-weight:bold; margin-bottom:10px; display:block;">1. 플랫폼 선택</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" value="instagram"> 📸 Instagram
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" value="youtube"> 🎥 YouTube
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" value="twitter"> 🐦 X (Twitter)
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" value="facebook"> 📘 Facebook
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 2: 날짜 선택 -->
+            <div class="calc-section">
+                <label style="color:var(--accent-color); font-weight:bold; margin-bottom:10px; display:block;">2. 업로드 일정 (Calendar)</label>
+                <input type="datetime-local" id="uploadTime" style="width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 8px;">
+            </div>
+
+            <!-- Step 3: 파일 드래그 앤 드롭 -->
+            <div class="calc-section">
+                <label style="color:var(--accent-color); font-weight:bold; margin-bottom:10px; display:block;">3. 미디어 파일 추가</label>
+                <div id="drop-zone" style="border: 2px dashed var(--border-color); padding: 30px; text-align: center; border-radius: 12px; transition: 0.3s; cursor: pointer;">
+                    <p id="drop-msg" style="margin: 0; opacity: 0.7;">사진이나 동영상을 여기로 드래그하거나<br>클릭해서 선택하세요.</p>
+                    <input type="file" id="fileInput" multiple style="display: none;" accept="image/*,video/*">
+                    <div id="file-preview" style="display: flex; gap: 10px; overflow-x: auto; margin-top: 10px; padding: 5px;"></div>
+                </div>
+            </div>
+
+            <button class="card-btn" onclick="simulateUpload()">예약 업로드 시작</button>
+            <span class="close-link" onclick="closeModal('uploadModal')" style="display: block; text-align: center;">닫기</span>
+        </div>
     </div>
 
     <div id="memberModal" class="modal">
@@ -686,6 +751,93 @@
                 console.error('News fetch error:', error);
                 newsList.innerHTML = '<li style="justify-content: center; opacity: 0.5;">뉴스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</li>';
             }
+        }
+
+        // === [NEW] 자동 업로드 시뮬레이션 ===
+        function simulateUpload() {
+            // 1. 플랫폼 확인
+            const platforms = [];
+            document.querySelectorAll('.checkbox-container input:checked').forEach(cb => {
+                platforms.push(cb.value);
+            });
+
+            if (platforms.length === 0) {
+                alert("⚠️ 업로드할 플랫폼을 하나 이상 선택해주세요.");
+                return;
+            }
+
+            // 2. 날짜 확인
+            const date = document.getElementById('uploadTime').value;
+            if (!date) {
+                alert("⚠️ 업로드할 날짜와 시간을 선택해주세요.");
+                return;
+            }
+
+            // 3. 파일 확인 (fileInput 또는 preview)
+            const fileInput = document.getElementById('fileInput');
+            // 실제 파일 객체는 fileInput.files에 있거나, 드래그앤드롭으로 처리된 로직이 필요함.
+            // 여기서는 시각적 프리뷰가 있는지를 기준으로 판단합니다.
+            const preview = document.getElementById('file-preview');
+            if (preview.children.length === 0 && fileInput.files.length === 0) {
+                alert("⚠️ 업로드할 사진이나 동영상을 추가해주세요.");
+                return;
+            }
+
+            // 시뮬레이션 성공 메시지
+            const platformNames = platforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(', ');
+            alert(`✅ 예약 완료!\n\n[${platformNames}]에\n[${date.replace('T', ' ')}] 시간으로\n미디어 업로드가 예약되었습니다.\n\n(이 기능은 현재 프로토타입이며 실제 업로드는 서버 연동이 필요합니다)`);
+            
+            closeModal('uploadModal');
+        }
+
+        // === 드래그 앤 드롭 로직 ===
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('file-preview');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', () => {
+            handleFiles(fileInput.files);
+        });
+
+        function handleFiles(files) {
+            preview.innerHTML = ''; // 기존 미리보기 초기화 (단일 세트 기준)
+            if (files.length > 0) {
+                document.getElementById('drop-msg').style.display = 'none';
+            }
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    let elem;
+                    if (file.type.startsWith('image/')) {
+                        elem = document.createElement('img');
+                        elem.src = e.target.result;
+                    } else if (file.type.startsWith('video/')) {
+                        elem = document.createElement('video');
+                        elem.src = e.target.result;
+                        elem.controls = false; // 썸네일처럼 보이게
+                    }
+                    if (elem) preview.appendChild(elem);
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         // 초기화 함수
