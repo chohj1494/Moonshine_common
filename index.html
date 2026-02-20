@@ -350,11 +350,8 @@
         <div class="modal-content">
             <h2 style="margin-bottom: 10px;">오늘의 AI 뉴스</h2>
             <p style="font-size: 0.9rem; opacity: 0.7;">매일 업데이트되는 AI 산업 주요 뉴스</p>
-            <ul class="member-list" style="text-align: left;">
-                <li><a href="https://openai.com/blog/dall-e-3" target="_blank" style="color: var(--text-color);">오픈AI, 새로운 이미지 생성 모델 'DALL-E 3' 공개</a></li>
-                <li><a href="https://blog.google/technology/ai/google-gemini-ai/" target="_blank" style="color: var(--text-color);">구글, 차세대 AI 어시스턴트 '제미니' 정식 출시</a></li>
-                <li><a href="https://www.etnews.com/20240319000207" target="_blank" style="color: var(--text-color);">엔비디아, AI 칩 시장 독주...경쟁사들 추격 안간힘</a></li>
-                <li><a href="https.msit.go.kr/bbs/view.do?sCode=user&mId=113&bId=69&artSeq=10065" target="_blank" style="color: var(--text-color);">정부, 'AI 윤리 가이드라인' 발표...안전한 AI 개발 강조</a></li>
+            <ul id="newsList" class="member-list" style="text-align: left;">
+                <li style="justify-content: center; opacity: 0.5;">뉴스를 불러오는 중...</li>
             </ul>
             <span class="close-link" onclick="closeModal('newsModal')">닫기</span>
         </div>
@@ -665,10 +662,37 @@
             }
         }
         
+        // === [NEW] AI 뉴스 가져오기 ===
+        async function fetchAINews() {
+            const newsList = document.getElementById('newsList');
+            const rssUrl = 'https://www.aitimes.com/rss/allArticle.xml'; // AI 타임스 RSS
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    newsList.innerHTML = ''; // 로딩 메시지 제거
+                    data.items.slice(0, 5).forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="${item.link}" target="_blank" style="color: var(--text-color);">${item.title}</a>`;
+                        newsList.appendChild(li);
+                    });
+                } else {
+                    throw new Error('RSS conversion failed');
+                }
+            } catch (error) {
+                console.error('News fetch error:', error);
+                newsList.innerHTML = '<li style="justify-content: center; opacity: 0.5;">뉴스를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</li>';
+            }
+        }
+
         // 초기화 함수
         function init() {
             applyInitialTheme();
             createStars();
+            fetchAINews(); // 뉴스 데이터 로드
         }
 
         // DOM 로드 후 초기화 실행
