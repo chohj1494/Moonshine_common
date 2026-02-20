@@ -310,7 +310,8 @@
             <div class="card">
                 <h3>🤝 Networking</h3>
                 <p>다양한 분야의 전문가들이 모여 AI와 시너지를 낼 수 있는 기회를 만듭니다.</p>
-                <button class="card-btn" onclick="openModal('memberModal')">멤버 확인</button>
+                <button class="card-btn" onclick="openModal('memberModal')" style="margin-bottom: 10px;">멤버 확인</button>
+                <button class="card-btn" onclick="openModal('contactModal')">문의 사항</button>
             </div>
         </div>
 
@@ -336,7 +337,7 @@
             <p style="font-size: 0.9rem; opacity: 0.7;">Moonshine과 함께하는 사람들</p>
             <ul class="member-list">
                 <li><span class="kor">조호준</span><span class="eng">Hojun Cho</span></li>
-                <li><span class="kor">임경민</span><span class="eng">Kyungmin Lim</span></li>
+                <li><span class="kor">임경민</span><span class="eng">Kyungmin Im</span></li>
                 <li><span class="kor">안동길</span><span class="eng">Donggil Ahn</span></li>
                 <li><span class="kor">백동호</span><span class="eng">Dongho Baek</span></li>
                 <li><span class="kor">전명훈</span><span class="eng">Myounghun Jeon</span></li>
@@ -449,6 +450,31 @@
             </div>
 
             <span class="close-link" onclick="closeModal('calcModal')">닫기</span>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 10px;">문의 사항</h2>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Moonshine에게 궁금한 점을 남겨주세요.</p>
+            
+            <form action="https://formspree.io/f/xojnnpqz" method="POST" style="margin-top: 30px; text-align: left;">
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label>이메일</label>
+                    <input type="email" name="email" required placeholder="your@email.com" style="text-align: left;">
+                </div>
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label>메시지</label>
+                    <textarea name="message" required placeholder="문의하실 내용을 입력해주세요." 
+                        style="width: 100%; height: 150px; padding: 12px; box-sizing: border-box; 
+                        background: var(--input-bg); border: 1px solid var(--border-color); 
+                        border-radius: 8px; color: var(--text-color); font-size: 1rem; 
+                        resize: none; font-family: inherit;"></textarea>
+                </div>
+                <button type="submit" class="card-btn">보내기</button>
+            </form>
+
+            <span class="close-link" onclick="closeModal('contactModal')">닫기</span>
         </div>
     </div>
 
